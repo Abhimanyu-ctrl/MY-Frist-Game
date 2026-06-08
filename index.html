@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brain Master — 200 Level Dimaag Challenge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07070f;--panel:#0f0f1c;--card:#161625;--border:#26264a;
+  --accent:#7c3aed;--accent2:#06b6d4;--gold:#f59e0b;
+  --red:#ef4444;--green:#10b981;--text:#e2e8f0;--muted:#475569;
+}
+body{background:var(--bg);color:var(--text);font-family:'Tiro Devanagari Hindi',serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem}
+#app{width:100%;max-width:560px;background:var(--bg);border-radius:20px;overflow:hidden;border:.5px solid var(--border)}
+
+/* COVER */
+#cover{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:92vh;padding:2.5rem 2rem;text-align:center;position:relative;overflow:hidden;background:radial-gradient(ellipse at 50% 40%, rgba(124,58,237,.12) 0%, transparent 65%)}
+.stars{position:absolute;top:0;left:0;width:100%;height:100%;overflow:hidden;pointer-events:none}
+.star{position:absolute;background:#fff;border-radius:50%;animation:twinkle var(--d,3s) ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.05}50%{opacity:.7}}
+.brain-emoji{font-size:5.5rem;animation:float 3.5s ease-in-out infinite;position:relative;z-index:1;filter:drop-shadow(0 0 24px rgba(124,58,237,.9))}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+.cover-title{font-family:'Orbitron',monospace;font-size:2.4rem;font-weight:900;color:#a78bfa;letter-spacing:4px;margin:.6rem 0 .2rem;position:relative;z-index:1}
+.cover-tagline{font-size:.75rem;letter-spacing:3px;color:var(--muted);text-transform:uppercase;position:relative;z-index:1;margin-bottom:1.4rem}
+.cover-desc{font-size:1rem;color:#94a3b8;max-width:360px;line-height:1.7;position:relative;z-index:1;margin-bottom:1.8rem}
+.level-pills{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;position:relative;z-index:1;margin-bottom:2rem}
+.pill{padding:5px 14px;border-radius:20px;font-size:.8rem;font-weight:700;letter-spacing:.5px}
+.p1{background:rgba(16,185,129,.15);color:#10b981;border:1px solid rgba(16,185,129,.3)}
+.p2{background:rgba(6,182,212,.15);color:#06b6d4;border:1px solid rgba(6,182,212,.3)}
+.p3{background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3)}
+.p4{background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3)}
+.p5{background:rgba(124,58,237,.15);color:#a78bfa;border:1px solid rgba(124,58,237,.3)}
+.btn-play{background:var(--accent);color:#fff;border:none;padding:16px 52px;border-radius:50px;font-family:'Orbitron',monospace;font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:2px;position:relative;z-index:1;transition:all .3s;box-shadow:0 0 30px rgba(124,58,237,.4)}
+.btn-play:hover{background:#6d28d9;transform:translateY(-2px);box-shadow:0 0 50px rgba(124,58,237,.7)}
+.cover-credit{position:relative;z-index:1;margin-top:2rem;font-size:.75rem;color:#334155;letter-spacing:1px}
+
+/* GAME */
+#game{display:none;padding:1rem}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--panel);border-radius:12px;border:.5px solid var(--border);margin-bottom:.8rem}
+.lvl-lbl{font-family:'Orbitron',monospace;font-size:.8rem;color:var(--accent2)}
+.score-lbl{font-family:'Orbitron',monospace;font-size:.9rem;color:var(--gold)}
+.lives{display:flex;gap:3px;font-size:1.1rem}
+.heart-dead{opacity:.2;filter:grayscale(1)}
+.tbar-wrap{height:5px;background:var(--border);border-radius:10px;margin-bottom:.8rem;overflow:hidden}
+.tbar{height:100%;border-radius:10px;background:var(--accent);transition:width .1s linear}
+.type-tag{display:inline-block;padding:3px 12px;border-radius:20px;font-size:.7rem;letter-spacing:1.5px;font-family:'Orbitron',monospace;margin-bottom:.5rem}
+.qbox{background:var(--card);border:.5px solid var(--border);border-radius:14px;padding:1.3rem;margin-bottom:.8rem;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.q-text{font-size:1.15rem;font-weight:700;line-height:1.5;color:var(--text)}
+.q-sub{font-size:.8rem;color:var(--muted);margin-top:.4rem}
+.grid{display:grid;gap:8px;margin-bottom:.8rem}
+.gc2{grid-template-columns:repeat(2,1fr)}
+.gc1{grid-template-columns:1fr}
+.opt{background:var(--card);border:.5px solid var(--border);color:var(--text);padding:12px 14px;border-radius:10px;font-family:'Tiro Devanagari Hindi',serif;font-size:.95rem;cursor:pointer;transition:all .2s;text-align:center;line-height:1.4}
+.opt:hover:not(:disabled){background:rgba(124,58,237,.15);border-color:var(--accent);transform:translateY(-1px)}
+.opt.cor{background:rgba(16,185,129,.15)!important;border-color:var(--green)!important;color:var(--green)!important}
+.opt.wrg{background:rgba(239,68,68,.15)!important;border-color:var(--red)!important;color:var(--red)!important}
+.opt:disabled{cursor:not-allowed}
+.fb{padding:10px 14px;border-radius:10px;font-size:.95rem;margin-bottom:.7rem;line-height:1.4}
+.fb-ok{background:rgba(16,185,129,.12);color:var(--green)}
+.fb-no{background:rgba(239,68,68,.12);color:var(--red)}
+.fb-time{background:rgba(245,158,11,.12);color:var(--gold)}
+.hint-box{display:flex;gap:8px;align-items:flex-start;padding:9px 12px;background:rgba(6,182,212,.07);border:.5px solid rgba(6,182,212,.2);border-radius:9px;margin-bottom:.7rem;font-size:.85rem;color:var(--accent2);line-height:1.5}
+.prog-wrap{margin-top:.5rem}
+.prog-top{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:3px}
+.prog-track{height:3px;background:var(--border);border-radius:10px;overflow:hidden}
+.prog-fill{height:100%;background:var(--accent);border-radius:10px;transition:width .5s ease}
+
+/* WORD HUNT */
+.word-display{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:.5rem 0}
+.lbox{width:36px;height:42px;background:var(--panel);border:.5px solid #3a3a5c;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;transition:all .3s;color:transparent}
+.lbox.found{background:rgba(16,185,129,.12);border-color:var(--green);color:var(--green)}
+.lbox.reveal{color:#f59e0b}
+.kb-row{display:flex;gap:5px;justify-content:center;margin-bottom:5px}
+.kbtn{background:var(--panel);border:.5px solid var(--border);color:var(--text);width:34px;height:34px;border-radius:6px;font-size:.78rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-family:monospace}
+.kbtn:hover:not(.ku){background:rgba(124,58,237,.2);border-color:var(--accent)}
+.kbtn.ku{opacity:.25;cursor:not-allowed;pointer-events:none}
+.kbtn.kc{background:rgba(16,185,129,.15);border-color:var(--green);color:var(--green)}
+.kbtn.kw{background:rgba(239,68,68,.1);border-color:var(--red);color:var(--red)}
+.wrong-info{text-align:center;font-size:.8rem;color:var(--muted);margin:4px 0 8px}
+
+/* SEQUENCE */
+.seq-disp{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin:.5rem 0}
+.sbox{min-width:42px;height:42px;padding:0 8px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;background:var(--panel);border:.5px solid var(--border);transition:all .3s}
+.sbox.qmark{color:#a78bfa;border-color:var(--accent)}
+.sbox.scor{background:rgba(16,185,129,.15);border-color:var(--green);color:var(--green)}
+.sbox.swrg{color:#f59e0b}
+
+/* MEMORY */
+.mem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:.5rem 0}
+.mcard{height:62px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.5rem;border:.5px solid var(--border);background:var(--panel);transition:all .25s;user-select:none}
+.mcard.flip{background:rgba(124,58,237,.15);border-color:var(--accent)}
+.mcard.matched{background:rgba(16,185,129,.12);border-color:var(--green);cursor:default}
+
+/* RESULT */
+#result{display:none;flex-direction:column;align-items:center;justify-content:center;min-height:70vh;padding:2.5rem 2rem;text-align:center;background:radial-gradient(ellipse at 50% 30%, rgba(124,58,237,.1) 0%, transparent 60%)}
+.r-icon{font-size:5rem;animation:bounce .5s ease;margin-bottom:.8rem}
+@keyframes bounce{0%{transform:scale(0)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+.r-title{font-family:'Orbitron',monospace;font-size:1.7rem;font-weight:900;color:#a78bfa;margin-bottom:.4rem}
+.r-sub{color:var(--muted);font-size:1rem;margin-bottom:1.2rem;line-height:1.5}
+.r-stats{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:1.5rem}
+.stat{background:var(--card);border:.5px solid var(--border);border-radius:12px;padding:14px 20px;min-width:95px}
+.stat-val{font-family:'Orbitron',monospace;font-size:1.4rem;font-weight:700;color:var(--accent2)}
+.stat-lbl{font-size:.75rem;color:var(--muted);margin-top:3px}
+.btn-retry{background:var(--accent);color:#fff;border:none;padding:12px 32px;border-radius:50px;font-family:'Orbitron',monospace;font-size:.85rem;cursor:pointer;letter-spacing:1px;margin:5px;transition:all .3s}
+.btn-retry:hover{background:#6d28d9;transform:scale(1.04)}
+.btn-home{background:var(--card);color:var(--text);border:.5px solid var(--border);padding:12px 32px;border-radius:50px;font-family:'Tiro Devanagari Hindi',serif;font-size:.95rem;cursor:pointer;margin:5px;transition:all .3s}
+.btn-home:hover{background:var(--panel)}
+
+@media(max-width:500px){
+  .cover-title{font-size:1.9rem}
+  .brain-emoji{font-size:4rem}
+  .q-text{font-size:1.05rem}
+  .kbtn{width:28px;height:28px;font-size:.7rem}
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- COVER -->
+<div id="cover">
+  <div class="stars" id="stars-wrap"></div>
+  <div class="brain-emoji">🧠</div>
+  <div class="cover-title">BRAIN MASTER</div>
+  <div class="cover-tagline">★ 200 Level Dimaag Challenge ★</div>
+  <div class="cover-desc">
+    Sirf math nahi — Paheliyan, Word Hunt, Sequence, Memory aur Logic Bomb!
+    Kya aap asli <strong>Brain Master</strong> ban sakte ho?
+  </div>
+  <div class="level-pills">
+    <span class="pill p1">🎭 Paheliyan 1–50</span>
+    <span class="pill p2">🔍 Word Hunt 51–100</span>
+    <span class="pill p3">🔢 Sequence 101–130</span>
+    <span class="pill p4">🧩 Memory 131–150</span>
+    <span class="pill p5">👾 Logic Bomb 151–200</span>
+  </div>
+  <button class="btn-play" onclick="startGame()">▶ KHELO ABHIMANYU</button>
+  <div class="cover-credit">Made with 🧠 — Brain Master v2.0</div>
+</div>
+
+<!-- GAME -->
+<div id="game">
+  <div class="topbar">
+    <div class="lvl-lbl">LEVEL <span id="lvl-num">1</span>/200</div>
+    <div class="score-lbl">⭐ <span id="score-num">0</span></div>
+    <div class="lives" id="lives-wrap"></div>
+  </div>
+  <div class="tbar-wrap"><div class="tbar" id="tbar"></div></div>
+  <div class="qbox">
+    <div class="type-tag" id="type-tag"></div>
+    <div class="q-text" id="q-text">Loading...</div>
+    <div class="q-sub" id="q-sub"></div>
+  </div>
+  <div id="fb-zone"></div>
+  <div id="game-zone"></div>
+  <div class="hint-box" id="hint-box" style="display:none">
+    💡 <span id="hint-text"></span>
+  </div>
+  <div class="prog-wrap">
+    <div class="prog-top"><span>Progress</span><span><span id="prog-num">0</span>/200</span></div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="result">
+  <div class="r-icon" id="r-icon">🏆</div>
+  <div class="r-title" id="r-title">SHANDAAR!</div>
+  <div class="r-sub" id="r-sub">Aap bahut hoshiyaar hain!</div>
+  <div class="r-stats">
+    <div class="stat"><div class="stat-val" id="r-score">0</div><div class="stat-lbl">Score</div></div>
+    <div class="stat"><div class="stat-val" id="r-acc">0%</div><div class="stat-lbl">Accuracy</div></div>
+    <div class="stat"><div class="stat-val" id="r-lvl">1</div><div class="stat-lbl">Level</div></div>
+  </div>
+  <button class="btn-retry" onclick="restartLevel()">🔄 Phir Khelein</button>
+  <button class="btn-home" onclick="goHome()">🏠 Home</button>
+</div>
+
+</div>
+<script>
+(function(){
+
+// Stars
+const sw = document.getElementById('stars-wrap');
+for(let i=0;i<60;i++){
+  const s=document.createElement('div');
+  const sz=Math.random()*2.5+.8;
+  s.className='star';
+  s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${2+Math.random()*5}s;animation-delay:${Math.random()*6}s`;
+  sw.appendChild(s);
+}
+
+// ─── DATA ───────────────────────────────────────────────────────────
+const PAHELIYAN = [
+  {q:'वो क्या है जो जितना इस्तेमाल करो, उतनी कम होती है?',opts:['मोमबत्ती','किताब','पानी','हवा'],a:'मोमबत्ती',h:'रोशनी देती है, खुद जलती रहती है'},
+  {q:'वो क्या है जो सुबह 4 पैर पर, दोपहर 2 पैर पर, शाम को 3 पैर पर चलता है?',opts:['इंसान','कुत्ता','बंदर','हाथी'],a:'इंसान',h:'यह एक प्रसिद्ध पहेली है — जीवन के तीन चरण'},
+  {q:'वो कौन सी चीज है जो टूटने के बाद ज्यादा काम आती है?',opts:['अंडा','शीशा','पत्थर','दिल'],a:'अंडा',h:'पकाने के लिए तोड़ना पड़ता है'},
+  {q:'जितना खाओ उतनी प्यास लगे — क्या है?',opts:['नमक','मिठाई','मिर्च','चावल'],a:'नमक',h:'खाने में डाला जाता है'},
+  {q:'वो क्या है जो हमेशा आगे बढ़ता है, कभी वापस नहीं आता?',opts:['वक्त','नदी','ट्रेन','हवा'],a:'वक्त',h:'सबसे कीमती चीज'},
+  {q:'एक आदमी की 5 बेटियाँ हैं, हर बेटी का एक भाई है। कुल बच्चे कितने?',opts:['10','6','11','7'],a:'6',h:'सभी बेटियों का एक ही भाई है!'},
+  {q:'वो क्या है जो रात को दिखता है, दिन में नहीं?',opts:['तारे','डर','सपना','नींद'],a:'तारे',h:'आसमान में चमकते हैं'},
+  {q:'जब मैं छोटा हूँ तो लंबा हूँ, जब बड़ा हूँ तो छोटा हूँ — क्या हूँ?',opts:['पेंसिल','मोमबत्ती','बच्चा','पेड़'],a:'मोमबत्ती',h:'जलने के साथ छोटी होती जाती है'},
+  {q:'वो क्या है जो बिना पाँव के चलता है, बिना आँखों के देखता है?',opts:['घड़ी','दरिया','रेडियो','हवा'],a:'घड़ी',h:'समय दिखाता है'},
+  {q:'मेरे पास है पर मैं इसे नहीं देख सकता, तुम्हारे पास नहीं पर तुम देख सकते हो — क्या है?',opts:['परछाईं','सपना','पीठ','भविष्य'],a:'परछाईं',h:'धूप में बनती है'},
+  {q:'वो कौन सी चीज है जो खरीदने से पहले तोड़ते हैं?',opts:['अंडा','बिस्किट','पहेली','ताला'],a:'अंडा',h:'दुकान पर ताज़गी जाँची जाती है'},
+  {q:'नाम है मेरा पानी, पर पानी हूँ नहीं। आँखों से निकलूँ, दिल से जुड़ा हूँ — क्या हूँ?',opts:['आँसू','पसीना','ओस','बारिश'],a:'आँसू',h:'दुख-खुशी में बहता है'},
+  {q:'वो क्या है जो सबके लिए खुलता है पर कोई इसे देख नहीं सकता?',opts:['दिमाग','दिल','सड़क','हवा'],a:'दिमाग',h:'सोचने की जगह'},
+  {q:'एक कमरे में 3 बल्ब हैं, बाहर 3 स्विच हैं। एक बार अंदर जाना है — तीनों पहचानोगे?',opts:['हाँ, हो सकता है','नहीं हो सकता','2 ही होंगे','अँधेरे में नहीं'],a:'हाँ, हो सकता है',h:'एक जलाओ, एक गर्म करो, एक बंद रखो'},
+  {q:'वो क्या है जो ऊपर जाता है पर कभी नीचे नहीं आता?',opts:['उम्र','धुआँ','पतंग','हवाई जहाज़'],a:'उम्र',h:'जन्म से मृत्यु तक एक ही दिशा'},
+  {q:'घर में है पर घर नहीं, हाथ में है पर हाथ नहीं — क्या है?',opts:['अंगूठी','दरवाज़ा','चाबी','घड़ी'],a:'अंगूठी',h:'उँगली में पहनते हैं'},
+  {q:'मुर्गा छत के किनारे अंडा देता है — अंडा किस तरफ गिरेगा?',opts:['दाईं तरफ','बाईं तरफ','सीधे','मुर्गा अंडा नहीं देता'],a:'मुर्गा अंडा नहीं देता',h:'मुर्गी अंडा देती है, मुर्गा नहीं!'},
+  {q:'वो क्या है जो आगे से भारी, पीछे से हल्का होता है?',opts:['ट्रक','ख़याल','बोझ','पानी'],a:'ट्रक',h:'इंजन आगे होता है'},
+  {q:'बिना बोले बात करे, बिना चले साथ चले — क्या है?',opts:['परछाईं','किताब','तस्वीर','दर्पण'],a:'परछाईं',h:'धूप में हमेशा साथ रहती है'},
+  {q:'एक नाव में 10 लोग हैं, 3 कूद गए — अब कितने बचे?',opts:['7','10','3','6'],a:'10',h:'"कूद गए" का मतलब नाव से बाहर कूदे, पर अभी भी नाव में वापस आ सकते हैं। पर असल सवाल: 3 कूदे माने नाव में 7 रहे... रुको: 10-3=7 — पर "कूदे" माने पानी में, नाव में 7!'},
+  {q:'एक ट्रेन दुर्घटना में कोई नहीं मरा — कैसे?',opts:['ट्रेन खाली थी','ड्राइवर बच गया','सभी सोए थे','ब्रेक लगे'],a:'ट्रेन खाली थी',h:'कोई था ही नहीं!'},
+  {q:'वो क्या है जिसके पास कमरे हैं पर दरवाज़े नहीं, पहाड़ हैं पर पेड़ नहीं, पानी है पर मछली नहीं?',opts:['नक्शा','सपना','तस्वीर','किताब'],a:'नक्शा',h:'दुनिया दर्शाता है'},
+  {q:'ऐसी कौन सी चीज है जो एक बार देखो तो हमेशा याद रहती है?',opts:['दर्पण','कैमरा','आँख','तस्वीर'],a:'तस्वीर',h:'यादें क़ैद करती है'},
+  {q:'5 भाई हैं, हर भाई की 1 बहन है। कुल बहनें कितनी हैं?',opts:['5','1','6','10'],a:'1',h:'सभी भाइयों की एक ही बहन है!'},
+  {q:'वो क्या है जो सर्दियों में पैदा होता है और गर्मियों में मर जाता है?',opts:['बर्फ','ओला','ठंडा पानी','धुंध'],a:'बर्फ',h:'सफेद, ठंडी, पिघलने वाली'},
+  {q:'डॉक्टर की बहन के भाई का नाम क्या है?',opts:['राम','श्याम','डॉक्टर','पता नहीं'],a:'डॉक्टर',h:'डॉक्टर की बहन के भाई = डॉक्टर खुद!'},
+  {q:'वो कौन सा जानवर है जो दिन में सोता है, रात में जागता है?',opts:['उल्लू','शेर','कुत्ता','हाथी'],a:'उल्लू',h:'रात का पक्षी'},
+  {q:'एक हवाई जहाज़ बिल्कुल US-Canada बॉर्डर पर क्रैश हुआ। बचे हुए लोगों को कहाँ दफनाएँगे?',opts:['US में','Canada में','बीच में','बचे हुओं को नहीं दफनाते'],a:'बचे हुओं को नहीं दफनाते',h:'Survivors (जीवित लोग) दफनाए नहीं जाते!'},
+  {q:'मैं जब भी बोलता हूँ तो ख़त्म हो जाता हूँ — क्या हूँ?',opts:['रहस्य','चुप्पी','आवाज़','राज़'],a:'चुप्पी',h:'बोलने से टूट जाती है'},
+  {q:'वो क्या है जो आपको मिल जाए तो आप इसे नहीं रखना चाहते, खो जाए तो ढूँढते हो?',opts:['मुसीबत','बुखार','झगड़ा','क़र्ज़'],a:'मुसीबत',h:'जीवन की कड़वी सच्चाई'},
+  {q:'बिना पंख के उड़ता है, बिना पैर के चलता है — क्या है?',opts:['वक्त','हवा','विचार','सपना'],a:'वक्त',h:'न रुकता है, न थकता है'},
+  {q:'जो दौड़ते हुए भी आगे नहीं जा सकता — क्या है?',opts:['ट्रेडमिल','घड़ी की सुई','पंखा','चरखा'],a:'ट्रेडमिल',h:'एक ही जगह दौड़ते रहो'},
+  {q:'वो क्या है जो सबके घर में है पर किसी का नहीं?',opts:['आग','हवा','रोशनी','शोर'],a:'हवा',h:'सबके लिए एक जैसी'},
+  {q:'एक बक्से में क्या है जो जितना निकालो उतना बड़ा होता जाता है?',opts:['छेद','हवा','रहस्य','पानी'],a:'छेद',h:'निकालते जाओ, बढ़ता जाएगा'},
+  {q:'मेरे दाँत हैं पर मैं काट नहीं सकता — क्या हूँ?',opts:['कंघी','चाकू','करवट','काँटा'],a:'कंघी',h:'बालों में फेरते हैं'},
+  {q:'दो माएँ, दो बेटियाँ मिलकर 3 खाना खाती हैं — हर एक ने एक-एक खाया। कैसे?',opts:['एक साथ नहीं खाया','तीन लोग हैं: दादी, माँ, बेटी','गलत सवाल है','4 लोग थे'],a:'तीन लोग हैं: दादी, माँ, बेटी',h:'माँ = दादी की बेटी भी है और बेटी की माँ भी'},
+  {q:'ऐसी कौन सी चीज़ है जो आपसे पहले आती है पर पीछे छूट जाती है?',opts:['परछाईं','नाम','आवाज़','यादें'],a:'परछाईं',h:'धूप में आगे भी बन सकती है — पर अक्सर पीछे'},
+  {q:'एक आदमी 20 मिनट पानी के अंदर रहा बिना साँस लिए — कैसे?',opts:['जादू था','वो तैराक था','वो पानी के ऊपर था','ऑक्सीजन टैंक था'],a:'वो पानी के ऊपर था',h:'"पानी के अंदर" — किनारे पर खड़ा था जहाँ पानी था'},
+  {q:'तालाब में 1 कमल का फूल है। हर दिन दोगुना होता है। 30 दिन में तालाब भरता है। 28 दिन में कितना भरा?',opts:['आधा','चौथाई','तीन चौथाई','लगभग पूरा'],a:'चौथाई',h:'30वें दिन पूरा → 29वें पर आधा → 28वें पर चौथाई'},
+  {q:'वो क्या है जो सभी रंगों को मिलाकर बनता है?',opts:['सफेद','काला','भूरा','ग्रे'],a:'सफेद',h:'प्रकाश की सभी तरंगें मिलकर'},
+  {q:'एक कमरे में एक मोमबत्ती, एक दीपक और एक गैस चूल्हा है। पहले क्या जलाएँगे?',opts:['मोमबत्ती','दीपक','गैस','माचिस'],a:'माचिस',h:'जलाने के लिए पहले माचिस चाहिए!'},
+  {q:'एक ट्रेन 60 km/h से चलती है, हवा उल्टी दिशा में 60 km/h से। धुआँ किस तरफ जाएगा?',opts:['आगे','पीछे','नहीं जाएगा','इलेक्ट्रिक ट्रेन है'],a:'इलेक्ट्रिक ट्रेन है',h:'आजकल ट्रेनें इलेक्ट्रिक होती हैं — धुआँ ही नहीं!'},
+  {q:'अगर आप South Pole पर खड़े हों तो आप किस दिशा में देखोगे?',opts:['North','South','East','West'],a:'North',h:'South Pole से सभी दिशाएँ North हैं!'},
+  {q:'वो क्या है जो पूछे जाने पर हमेशा "हाँ" जवाब देता है?',opts:['गूँज','दर्पण','कैमरा','डायरी'],a:'गूँज',h:'पहाड़ों में आवाज़ वापस आती है'},
+  {q:'नौ (9) को दो हिस्सों में बाँटो जो सम हों?',opts:['4 और 5','4.5 और 4.5','3 और 6','ऐसा नहीं हो सकता'],a:'4.5 और 4.5',h:'गणित में 9/2 = 4.5'},
+  {q:'1000 रुपए के लिए: 990+10=? एवं 900+90=? दोनों जोड़ने पर?',opts:['2000','1980','2000 नहीं','1000+1000=2000'],a:'1980',h:'990+10=1000, 900+90=990... नहीं: 900+90=990! इसलिए 1000+990=1990... फिर से: 990+10=1000, 900+90=990, कुल = 1990'},
+  {q:'वो क्या है जो एक बार आता है मिनट में, दो बार आता है मोमेंट में, एक बार भी नहीं आता हज़ार साल में?',opts:['M अक्षर','T अक्षर','समय','अवसर'],a:'M अक्षर',h:'miNute में एक M, MoMent में दो M, thousand years में कोई M नहीं'},
+  {q:'एक डॉक्टर एक मरीज़ को देखकर कहता है: "यह आदमी मेरा भाई है।" मरीज़ कहता है: "मेरा कोई भाई नहीं।" — कैसे?',opts:['डॉक्टर झूठ बोल रहा','मरीज़ भूल गया','डॉक्टर एक महिला है','सौतेला भाई है'],a:'डॉक्टर एक महिला है',h:'डॉक्टर बहन है — पर मरीज़ ने "भाई" नहीं कहा'},
+  {q:'रात के 12 बजे बारिश हो रही है। 48 घंटे बाद धूप निकलेगी?',opts:['हाँ','नहीं','पता नहीं','मौसम पर निर्भर'],a:'नहीं',h:'48 घंटे बाद = अगले दिन रात के 12 बजे! रात में धूप नहीं'},
+  {q:'एक किसान के 17 भेड़ें थीं। सभी एक को छोड़कर मर गईं — कितनी बचीं?',opts:['0','1','16','17'],a:'1',h:'"सभी एक को छोड़कर" = एक बची'},
+];
+
+const WORDS_HI = [
+  {word:'DIMAAG',clue:'सोचने की जगह — हमारे सिर में',cat:'🧠 शरीर'},
+  {word:'JUNGLE',clue:'जानवरों का घर, घने पेड़',cat:'🌿 प्रकृति'},
+  {word:'ROCKET',clue:'अंतरिक्ष में जाता है',cat:'🚀 विज्ञान'},
+  {word:'MIRROR',clue:'चेहरा दिखाता है',cat:'🔮 घर'},
+  {word:'BRIDGE',clue:'नदी के ऊपर बना रास्ता',cat:'🌉 जगह'},
+  {word:'PUZZLE',clue:'दिमाग़ लगाने वाली चुनौती',cat:'🧩 खेल'},
+  {word:'CANDLE',clue:'अँधेरे में रोशनी देती है',cat:'🕯️ घर'},
+  {word:'FOREST',clue:'बहुत सारे पेड़ों की जगह',cat:'🌲 प्रकृति'},
+  {word:'CASTLE',clue:'राजा का विशाल महल',cat:'🏰 जगह'},
+  {word:'SPIDER',clue:'जाल बुनता है, 8 पैर',cat:'🕷️ जीव'},
+  {word:'ANCHOR',clue:'जहाज़ रोकता है पानी में',cat:'⚓ समुद्र'},
+  {word:'SATURN',clue:'छल्ले वाला ग्रह',cat:'🪐 अंतरिक्ष'},
+  {word:'DESERT',clue:'रेत और गर्मी की जगह',cat:'🏜️ जगह'},
+  {word:'PARROT',clue:'बोलने वाला रंगीन पक्षी',cat:'🦜 जीव'},
+  {word:'GARDEN',clue:'फूल और पौधे उगाने की जगह',cat:'🌸 जगह'},
+  {word:'BUTTER',clue:'टोस्ट पर लगाते हैं, पीला',cat:'🧈 खाना'},
+  {word:'LADDER',clue:'ऊपर चढ़ने के लिए',cat:'🪜 चीज़'},
+  {word:'FRIEND',clue:'सबसे प्यारा रिश्ता',cat:'👫 रिश्ते'},
+  {word:'ORANGE',clue:'नारंगी रंग का फल',cat:'🍊 फल'},
+  {word:'SILVER',clue:'चाँदी — एक कीमती धातु',cat:'💍 धातु'},
+  {word:'TEMPLE',clue:'भगवान की पूजा की जगह',cat:'🛕 धर्म'},
+  {word:'WINTER',clue:'ठंड का मौसम',cat:'❄️ मौसम'},
+  {word:'FLOWER',clue:'पौधों पर खिलता है, सुंदर',cat:'🌺 प्रकृति'},
+  {word:'PLANET',clue:'सूर्य के चारों ओर घूमता है',cat:'🪐 अंतरिक्ष'},
+  {word:'MUSEUM',clue:'इतिहास और कला की जगह',cat:'🏛️ जगह'},
+  {word:'MONKEY',clue:'पेड़ पर चढ़ने वाला जीव',cat:'🐒 जीव'},
+  {word:'CLOUDS',clue:'आसमान में उड़ते हैं, बारिश देते हैं',cat:'☁️ प्रकृति'},
+  {word:'BOTTLE',clue:'पानी या जूस रखने की चीज़',cat:'🍶 चीज़'},
+  {word:'GUITAR',clue:'तार वाला संगीत यंत्र',cat:'🎸 संगीत'},
+  {word:'MARKET',clue:'ख़रीदारी की जगह',cat:'🛒 जगह'},
+  {word:'PENCIL',clue:'लिखने की चीज़, मिटा सकते हो',cat:'✏️ शिक्षा'},
+  {word:'RABBIT',clue:'लंबे कान वाला छोटा जानवर',cat:'🐰 जीव'},
+  {word:'SCHOOL',clue:'पढ़ाई की जगह',cat:'🏫 शिक्षा'},
+  {word:'SUNSET',clue:'शाम को सूरज डूबना',cat:'🌅 प्रकृति'},
+  {word:'TROPHY',clue:'जीत का इनाम',cat:'🏆 खेल'},
+  {word:'VALLEY',clue:'पहाड़ों के बीच की जगह',cat:'🏞️ जगह'},
+  {word:'INSECT',clue:'छोटे जीव जिनके 6 पैर',cat:'🐛 जीव'},
+  {word:'OXYGEN',clue:'साँस लेने के लिए ज़रूरी',cat:'💨 विज्ञान'},
+  {word:'PALACE',clue:'राजाओं का आलीशान घर',cat:'🏯 जगह'},
+  {word:'DONKEY',clue:'बोझ उठाने वाला जानवर',cat:'🫏 जीव'},
+  {word:'ENGINE',clue:'गाड़ी या ट्रेन का दिल',cat:'⚙️ तकनीक'},
+  {word:'FOREST',clue:'जंगल — घने पेड़ों का घर',cat:'🌳 प्रकृति'},
+  {word:'HAMMER',clue:'ठोकने का औज़ार',cat:'🔨 औज़ार'},
+  {word:'ISLAND',clue:'चारों तरफ पानी से घिरी ज़मीन',cat:'🏝️ जगह'},
+  {word:'JAGUAR',clue:'तेज़ और धब्बेदार जंगली बिल्ली',cat:'🐆 जीव'},
+  {word:'KETTLE',clue:'पानी गर्म करने का बर्तन',cat:'🫖 रसोई'},
+  {word:'LOCKET',clue:'गले में पहनते हैं, तस्वीर होती है',cat:'📿 गहना'},
+  {word:'MAGNET',clue:'लोहे को खींचता है',cat:'🔮 विज्ञान'},
+  {word:'NEEDLE',clue:'सिलाई में काम आता है',cat:'🧵 घर'},
+  {word:'OYSTER',clue:'समुद्री जीव जिसमें मोती बनता है',cat:'🦪 समुद्र'},
+];
+
+const SEQUENCE_DATA = [
+  {seq:[2,4,8,16,'?'],ans:'32',h:'हर बार 2 से गुणा',type:'num'},
+  {seq:[1,3,6,10,'?'],ans:'15',h:'+2, +3, +4, +5 का क्रम',type:'num'},
+  {seq:['🔴','🔵','🟡','🔴','🔵','?'],ans:'🟡',h:'3 का पैटर्न दोहराता है',type:'emo'},
+  {seq:[1,4,9,16,25,'?'],ans:'36',h:'वर्ग संख्याएँ: 1², 2², 3²...',type:'num'},
+  {seq:['क','ग','च','ट','?'],ans:'त',h:'हिंदी वर्णमाला में अगला वर्ग',type:'txt'},
+  {seq:[3,6,11,18,27,'?'],ans:'38',h:'+3, +5, +7, +9, +11',type:'num'},
+  {seq:['🌑','🌒','🌓','🌔','?'],ans:'🌕',h:'चाँद के phases',type:'emo'},
+  {seq:[100,90,81,73,'?'],ans:'66',h:'-10, -9, -8, -7, -6',type:'num'},
+  {seq:[2,3,5,7,11,13,'?'],ans:'17',h:'अभाज्य संख्याएँ (Prime Numbers)',type:'num'},
+  {seq:[1,1,2,3,5,8,'?'],ans:'13',h:'Fibonacci: पिछले दो का जोड़',type:'num'},
+  {seq:['🍎','🍊','🍋','🍇','?'],ans:'🍓',h:'फलों की लाइन जारी रखो',type:'emo'},
+  {seq:[5,10,20,40,'?'],ans:'80',h:'हर बार 2 से गुणा',type:'num'},
+  {seq:['A','C','E','G','?'],ans:'I',h:'अंग्रेज़ी में एक-एक छोड़ते जाओ',type:'txt'},
+  {seq:[0,1,4,9,16,'?'],ans:'25',h:'n² : 0,1,4,9,16,25',type:'num'},
+  {seq:['सोम','मंगल','बुध','गुरु','?'],ans:'शुक्र',h:'हफ्ते के दिन',type:'txt'},
+  {seq:[7,14,21,28,'?'],ans:'35',h:'7 का पहाड़ा',type:'num'},
+  {seq:['❄️','🌸','☀️','🍂','?'],ans:'❄️',h:'चारों मौसम दोहराते हैं',type:'emo'},
+  {seq:[1,2,4,7,11,'?'],ans:'16',h:'+1, +2, +3, +4, +5',type:'num'},
+  {seq:['क','ख','ग','घ','?'],ans:'ङ',h:'हिंदी वर्णमाला का क्रम',type:'txt'},
+  {seq:[512,256,128,64,'?'],ans:'32',h:'हर बार आधा करते जाओ',type:'num'},
+  {seq:['🐣','🐥','🐔','🥚','?'],ans:'🐣',h:'मुर्गी का जीवन चक्र दोहराता है',type:'emo'},
+  {seq:[3,9,27,81,'?'],ans:'243',h:'3 की घात: 3¹,3²,3³,3⁴,3⁵',type:'num'},
+  {seq:['जन','फर','मार','अप्र','?'],ans:'मई',h:'महीनों के नाम',type:'txt'},
+  {seq:[10,9,7,4,'?'],ans:'0',h:'-1, -2, -3, -4',type:'num'},
+  {seq:['🌙','⭐','🌙','⭐','?'],ans:'🌙',h:'2 का पैटर्न',type:'emo'},
+  {seq:[8,6,4,2,'?'],ans:'0',h:'हर बार 2 घटाते जाओ',type:'num'},
+  {seq:['सोम','बुध','शुक्र','?'],ans:'रवि',h:'एक-एक दिन छोड़ते जाओ',type:'txt'},
+  {seq:[1,3,7,15,31,'?'],ans:'63',h:'×2+1: 1,3,7,15,31,63',type:'num'},
+  {seq:['🔼','🔽','🔼','🔽','?'],ans:'🔼',h:'ऊपर-नीचे का पैटर्न',type:'emo'},
+  {seq:[144,121,100,81,'?'],ans:'64',h:'वर्ग घटते जाते हैं: 12²,11²,10²,9²,8²',type:'num'},
+];
+
+const MEMORY_DATA = [
+  {pairs:['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼'],showTime:4000},
+  {pairs:['🍎','🍊','🍋','🍇','🍓','🍑','🍒','🥭'],showTime:4000},
+  {pairs:['🚗','✈️','🚢','🚂','🚁','🛸','🛵','🚲'],showTime:3500},
+  {pairs:['🏔️','🌋','🏝️','🌊','🏜️','🌲','🌺','🌙'],showTime:3500},
+  {pairs:['🎸','🎹','🥁','🎺','🎻','🪗','🎷','🎵'],showTime:3000},
+  {pairs:['🦁','🐯','🐻','🦊','🐺','🦝','🐗','🦌'],showTime:3000},
+  {pairs:['🍕','🍔','🌮','🍜','🍣','🍩','🍦','🎂'],showTime:3000},
+  {pairs:['⚽','🏀','🏈','⚾','🎾','🏐','🏉','🎱'],showTime:2500},
+  {pairs:['🌹','🌷','🌸','🌻','🌺','💐','🌼','🍀'],showTime:2500},
+  {pairs:['🌍','🌎','🌏','🗺️','⛰️','🏔️','🌋','🏝️'],showTime:2000},
+  {pairs:['🍇','🍈','🍉','🍊','🍋','🍌','🍍','🥭'],showTime:2000},
+  {pairs:['🚀','🛸','🛩️','✈️','🚁','🛥️','🚢','🛳️'],showTime:2000},
+  {pairs:['🎠','🎡','🎢','🎪','🎭','🎨','🎬','🎤'],showTime:1800},
+  {pairs:['🦋','🐝','🐛','🦗','🕷️','🦂','🪲','🪳'],showTime:1800},
+  {pairs:['💎','💍','👑','🏆','🎖️','🥇','🎗️','🎀'],showTime:1500},
+  {pairs:['🌈','⭐','🌙','☀️','❄️','⚡','🔥','💧'],showTime:1500},
+  {pairs:['📱','💻','🖥️','⌨️','🖱️','📷','📺','📻'],showTime:1500},
+  {pairs:['🍫','🍬','🍭','🍮','🍯','🍰','🎂','🧁'],showTime:1200},
+  {pairs:['🦅','🦆','🦉','🦚','🦜','🐦','🕊️','🦤'],showTime:1200},
+  {pairs:['🍀','🌿','🌱','🌾','🍁','🍂','🍃','🌵'],showTime:1000},
+];
+
+const LOGIC_BOMBS = [
+  {q:'Monty Hall puzzle: 3 दरवाज़े — 1 के पीछे गाड़ी, 2 के पीछे बकरी। आपने 1 चुना। Host ने 2 खोला (बकरी)। अब बदलोगे?',opts:['हाँ बदलेंगे','नहीं बदलेंगे','Same chance है','कोई फ़र्क नहीं'],a:'हाँ बदलेंगे',h:'बदलने पर 2/3 chance! Classic Probability Paradox'},
+  {q:'0.999... (बार-बार चलने वाला) = ?',opts:['1 के बराबर','1 से थोड़ा कम','0.999','अलग नंबर है'],a:'1 के बराबर',h:'1/3=0.333..., तीन गुना=0.999...=1'},
+  {q:'एक झूठा और एक सच बोलने वाला दरवाज़े पर हैं। एक ही सवाल पूछ सकते हो। क्या पूछोगे?',opts:['"दूसरा क्या कहेगा?"','"तुम कहाँ हो?"',',"सच वाला कौन?"','"यह रास्ता कहाँ जाता है?"'],a:'"दूसरा क्या कहेगा?"',h:'दोनों एक ही जवाब देंगे — गलत रास्ता'},
+  {q:'Hilbert Hotel में अनंत मेहमान हैं। एक और आया। क्या कमरा मिलेगा?',opts:['हाँ','नहीं','शायद','होटल बंद है'],a:'हाँ',h:'सभी n→n+1 शिफ्ट हों, कमरा 1 खाली!'},
+  {q:'नाई पहेली: "नाई सिर्फ उन्हें दाढ़ी बनाता है जो खुद नहीं बनाते।" नाई की दाढ़ी कौन बनाता है?',opts:['खुद बनाता है','दूसरा नाई','यह paradox है','कोई नहीं'],a:'यह paradox है',h:'Russell\'s Paradox — कोई solution नहीं!'},
+  {q:'अगर आप तीसरे स्थान पर हो और दूसरे वाले को overtake करो — अब कहाँ हो?',opts:['पहले','दूसरे','तीसरे','चौथे'],a:'दूसरे',h:'सिर्फ दूसरे वाले को ही पकड़ा!'},
+  {q:'एक डॉक्टर की बहन के भाई का नाम "डॉक्टर" है। मरीज़ कहता है उसका कोई भाई नहीं। कैसे?',opts:['डॉक्टर झूठ बोल रहा','मरीज़ भूल गया','डॉक्टर एक महिला है','सौतेला भाई है'],a:'डॉक्टर एक महिला है',h:'डॉक्टर = बहन है मरीज़ की!'},
+  {q:'एक रेलगाड़ी 60 km/h से 100 km जाती है। वापस 40 km/h से आती है। औसत speed?',opts:['50 km/h','48 km/h','46 km/h','52 km/h'],a:'48 km/h',h:'Harmonic Mean: 2×60×40÷(60+40) = 4800÷100 = 48'},
+  {q:'100! (100 factorial) के अंत में कितने ज़ीरो हैं?',opts:['20','24','25','22'],a:'24',h:'⌊100/5⌋+⌊100/25⌋ = 20+4 = 24'},
+  {q:'Turing Test से पता चलता है कि machine...',opts:['सच में सोचती है','Human जैसा behave करती है','Intelligent है','Conscious है'],a:'Human जैसा behave करती है',h:'Turing Test सिर्फ behavior test है'},
+  {q:'अगर एक घड़ी दिन में 2 बार सही time दिखाती है — क्या वो accurate है?',opts:['हाँ','नहीं','शायद','बंद घड़ी भी दिन में 2 बार सही होती है'],a:'बंद घड़ी भी दिन में 2 बार सही होती है',h:'रुकी घड़ी 12 घंटे में एक बार सही होती है!'},
+  {q:'अगर 5 बिल्लियाँ 5 मिनट में 5 चूहे खाती हैं तो 100 बिल्लियाँ 100 मिनट में कितने खाएंगी?',opts:['100','500','1000','2000'],a:'2000',h:'प्रति बिल्ली प्रति मिनट = 1/5, 100×100×(1/5)=2000... या: 100 min × 100 cats × (1 mouse/5 min per cat) = 2000'},
+  {q:'कागज़ को जितनी बार मोड़ सको, उसकी thickness क्या होगी? (42 बार मोड़ें)',opts:['कुछ cm','1 meter','चाँद तक','पृथ्वी तक'],a:'चाँद तक',h:'2^42 बार double = 439,804 km जो चाँद की दूरी से ज़्यादा!'},
+  {q:'अगर मैं आपसे कहूँ "यह वाक्य झूठ है" — तो?',opts:['यह सच है','यह झूठ है','Paradox है','कोई मतलब नहीं'],a:'Paradox है',h:'Liar\'s Paradox — सच हो तो झूठ, झूठ हो तो सच!'},
+  {q:'एक नाव में 10 लोग हैं। 5 ने छाते खोले, 3 ने चश्मे पहने, 2 ने कुछ नहीं किया। बारिश में सब भीगे?',opts:['हाँ','नहीं — छाते थे','सिर्फ 2 भीगे','5 नहीं भीगे'],a:'हाँ',h:'नाव में बारिश में सब भीगते हैं — छाता ऊपर से बचाए, नाव डूबे तो?... असल में: छाता वाले नहीं भीगे!'},
+  {q:'एक शतरंज की बिसात पर 1 दाने पहले, हर अगले खाने में दोगुना। 64वें खाने में कितने दाने?',opts:['64','1000 करोड़','2^63','असंख्य'],a:'2^63',h:'2^63 ≈ 9.2 quintillion — पूरी दुनिया के चावल से भी ज़्यादा!'},
+  {q:'अगर हर इंसान के बाल गिनो तो क्या दो लोगों के बाल की संख्या बराबर होगी?',opts:['नहीं होगी','हो सकती है','Pigeonhole Principle: हाँ होगी','असंभव है'],a:'Pigeonhole Principle: हाँ होगी',h:'80 करोड़ लोग, अधिकतम 1.5 लाख बाल → same count वाले ज़रूर होंगे'},
+  {q:'x^x = 2 का approximate solution?',opts:['√2','1.41','1.56','2'],a:'√2',h:'(√2)^(√2) ≈ 2, और √2 = 1.414...'},
+  {q:'एक game में 100 कैदी हैं। हर एक को 1-100 नंबर वाले box में से खोलने की chance है — 50 box खोल सकते हैं। Optimal strategy?',opts:['Random choose करें','अपने नंबर से शुरू करें — follow the chain','पहले 50 खोलें','Last 50 खोलें'],a:'अपने नंबर से शुरू करें — follow the chain',h:'Loop following strategy से ~31% chance बनती है!'},
+  {q:'अगर P≠NP हो तो क्या होगा?',opts:['Computers तेज़ होंगे','कुछ problems हमेशा कठिन रहेंगी','Internet बंद होगा','AI impossible होगी'],a:'कुछ problems हमेशा कठिन रहेंगी',h:'P vs NP — Computer Science का सबसे बड़ा unsolved problem!'},
+  {q:'एक perfect shuffle (Riffle Shuffle) 52 पत्तों वाली deck को कितनी बार करने पर original order में आती है?',opts:['52','26','8','13'],a:'8',h:'In-shuffle: 8 perfect shuffles से original order वापस!'},
+  {q:'Birthday Paradox: कितने लोगों में 50% chance होती है कि 2 का birthday same हो?',opts:['183','100','23','50'],a:'23',h:'सिर्फ 23 लोगों में! 365 नहीं — क्योंकि pairs की संख्या बढ़ती है'},
+  {q:'एक कमरे में दर्पण के सामने दर्पण — कितने प्रतिबिंब?',opts:['2','100','अनंत','10'],a:'अनंत',h:'हर reflection में और reflection — theoretically infinite'},
+  {q:'Banach-Tarski Paradox: एक गोले को तोड़कर...',opts:['वापस जोड़ा जा सकता है','दो गोले बनाए जा सकते हैं','इसका कोई solution नहीं','केवल theory है'],a:'दो गोले बनाए जा सकते हैं',h:'Mathematical proof है — physical नहीं, abstract sets में!'},
+  {q:'एक box में 100 बल्ब हैं — 10% खराब। एक-एक test करें, पहला खराब मिला। कितने test में?',opts:['10','1','हर बार अलग','Average 10 लेकिन पहला 1 में भी हो सकता है'],a:'Average 10 लेकिन पहला 1 में भी हो सकता है',h:'Geometric distribution — expected = 1/p = 10, पर pहला हमेशा uncertain'},
+  {q:'अगर हर atom एक second में count करें तो पूरे universe के atoms गिनने में कितना समय?',opts:['1000 साल','1 million साल','Billions of years','Universe की उम्र से ज़्यादा'],a:'Universe की उम्र से ज़्यादा',h:'~10^82 atoms, 1 per second = 10^82 seconds >> 13.8 billion years'},
+  {q:'Godel\'s Incompleteness Theorem कहता है:',opts:['गणित में सब prove हो सकता है','कुछ सच statements prove नहीं हो सकतीं','गणित गलत है','Logic काम नहीं करता'],a:'कुछ सच statements prove नहीं हो सकतीं',h:'किसी भी consistent formal system में unprovable truths होती हैं'},
+  {q:'अगर आप प्रकाश की गति से travel करो और headlights जलाओ — रोशनी कहाँ जाएगी?',opts:['आगे c speed से','आगे 2c speed से','रुक जाएगी','पीछे जाएगी'],a:'आगे c speed से',h:'Special Relativity: light हमेशा c speed से ही जाती है'},
+  {q:'100 कैदी, 100 drawer, हर drawer में 1 नाम। 50 drawers खोलने की छूट। Optimal survival chance?',opts:['50%','(1/2)^100','~30.7%','0%'],a:'~30.7%',h:'Loop strategy: ~30.7% chance सभी बचें — random से बेहतर'},
+  {q:'Twin Paradox: एक जुड़वाँ अंतरिक्ष में तेज़ गई, दूसरी पृथ्वी पर रही। वापस आई तो?',opts:['दोनों same उम्र','अंतरिक्ष वाली छोटी','पृथ्वी वाली छोटी','कोई फ़र्क नहीं'],a:'अंतरिक्ष वाली छोटी',h:'Time dilation: तेज़ गति पर समय धीमा — special relativity'},
+  {q:'एक सिक्का 99 बार Head आया। 100वीं बार का chance?',opts:['99%','50%','1%','100%'],a:'50%',h:'Coin flips independent हैं — हर बार 50/50!'},
+  {q:'अगर एक program खुद को run करे और खुद को test करे — Halting Problem में क्या होगा?',opts:['Program रुकेगा','Program नहीं रुकेगा','Paradox होगा','Error आएगा'],a:'Paradox होगा',h:'Turing\'s Halting Problem — undecidable! Proof by contradiction'},
+];
+
+// ─── BUILD QUESTION LIST ─────────────────────────────────────────────
+let allQ = [];
+function buildQ(){
+  allQ = [];
+  for(let i=0;i<200;i++){
+    const lvl = i+1;
+    if(lvl<=50){
+      const d = PAHELIYAN[i % PAHELIYAN.length];
+      allQ.push({lvl,mode:'mcq',tag:'🎭 पहेली',tc:'#a78bfa',bg:'rgba(124,58,237,.12)',
+        q:d.q, opts:[...d.opts].sort(()=>Math.random()-.5), ans:d.a, hint:d.h,
+        time: lvl<=20?35:lvl<=35?28:22});
+    } else if(lvl<=100){
+      const d = WORDS_HI[(i-50) % WORDS_HI.length];
+      allQ.push({lvl,mode:'word',tag:'🔍 वर्ड हंट',tc:'#06b6d4',bg:'rgba(6,182,212,.12)',
+        q:d.clue, word:d.word, cat:d.cat,
+        time: lvl<=70?50:lvl<=85?40:32});
+    } else if(lvl<=130){
+      const d = SEQUENCE_DATA[(i-100) % SEQUENCE_DATA.length];
+      allQ.push({lvl,mode:'seq',tag:'🔢 सीक्वेंस',tc:'#f59e0b',bg:'rgba(245,158,11,.12)',
+        q:'अगला क्या आएगा?', seq:d.seq, ans:String(d.ans), hint:d.h, seqType:d.type,
+        time: lvl<=115?28:lvl<=122?22:18});
+    } else if(lvl<=150){
+      const d = MEMORY_DATA[(i-130) % MEMORY_DATA.length];
+      allQ.push({lvl,mode:'mem',tag:'🧩 मेमोरी',tc:'#10b981',bg:'rgba(16,185,129,.12)',
+        q:'सभी pairs ढूँढो!', pairs:d.pairs, showTime:d.showTime,
+        time: Math.ceil(d.showTime/1000) + 25});
+    } else {
+      const d = LOGIC_BOMBS[(i-150) % LOGIC_BOMBS.length];
+      allQ.push({lvl,mode:'mcq',tag:'👾 लॉजिक बम',tc:'#ef4444',bg:'rgba(239,68,68,.12)',
+        q:d.q, opts:[...d.opts].sort(()=>Math.random()-.5), ans:d.a, hint:d.h,
+        time: lvl<=170?30:lvl<=185?24:18});
+    }
+  }
+}
+
+// ─── STATE ───────────────────────────────────────────────────────────
+let S={}, timerID, wordSt={}, memSt={};
+
+function initS(fromLvl){
+  buildQ();
+  S={lvl:fromLvl||1,score:0,lives:3,correct:0,total:0,timeLeft:1,maxTime:30,answered:false};
+}
+
+// ─── UI HELPERS ──────────────────────────────────────────────────────
+const $=id=>document.getElementById(id);
+function hearts(){
+  return [0,1,2].map(i=>`<span class="${i>=S.lives?'heart-dead':''}">❤️</span>`).join('');
+}
+function showFb(type,msg){
+  const m={'ok':'fb-ok','no':'fb-no','time':'fb-time'};
+  $('fb-zone').innerHTML=`<div class="fb ${m[type]}">${msg}</div>`;
+}
+function nextLvl(){S.lvl++;loadQ();}
+function loseLife(msg){
+  S.lives--; $('lives-wrap').innerHTML=hearts(); showFb('no',msg);
+  if(S.lives<=0) setTimeout(()=>showResult('lose'),1800);
+  else setTimeout(()=>nextLvl(),2000);
+}
+function calcPts(){
+  const b=S.lvl<=50?15:S.lvl<=100?25:S.lvl<=130?40:S.lvl<=150?50:65;
+  return b+Math.max(0,Math.ceil(S.timeLeft));
+}
+
+// ─── TIMER ───────────────────────────────────────────────────────────
+function startTimer(maxT){
+  clearInterval(timerID);
+  S.maxTime=maxT; S.timeLeft=maxT;
+  const bar=$('tbar'); bar.style.width='100%'; bar.style.background='#7c3aed';
+  timerID=setInterval(()=>{
+    S.timeLeft-=.1;
+    const p=Math.max(0,S.timeLeft/S.maxTime*100);
+    bar.style.width=p+'%';
+    bar.style.background=p>60?'#7c3aed':p>30?'#f59e0b':'#ef4444';
+    if(S.timeLeft<=0){clearInterval(timerID);if(!S.answered)timeOut();}
+  },100);
+}
+
+function timeOut(){
+  if(S.answered)return;
+  S.answered=true; S.total++;
+  const q=allQ[S.lvl-1];
+  let ansStr = q.ans || (q.word?`"${q.word}"`:'');
+  showFb('time',`⏰ समय ख़त्म! सही था: ${ansStr}`);
+  if(q.mode==='word'){
+    q.word.split('').forEach((_,i)=>{
+      const lb=$('lb-'+i);
+      if(lb){lb.classList.remove('blank');lb.classList.add('reveal');}
+    });
+  }
+  S.lives--; $('lives-wrap').innerHTML=hearts();
+  if(S.lives<=0) setTimeout(()=>showResult('lose'),1900);
+  else setTimeout(()=>nextLvl(),2200);
+}
+
+// ─── LOAD QUESTION ───────────────────────────────────────────────────
+function loadQ(){
+  if(S.lvl>200){showResult('win');return;}
+  const q=allQ[S.lvl-1];
+  if(!q){showResult('win');return;}
+  S.answered=false;
+  clearInterval(timerID);
+  $('lvl-num').textContent=S.lvl;
+  $('score-num').textContent=S.score;
+  $('lives-wrap').innerHTML=hearts();
+  $('prog-num').textContent=S.lvl;
+  $('prog-fill').style.width=((S.lvl-1)/200*100)+'%';
+  $('fb-zone').innerHTML='';
+  const tt=$('type-tag');
+  tt.textContent=q.tag; tt.style.background=q.bg; tt.style.color=q.tc;
+  $('q-text').textContent=q.q;
+  $('q-sub').textContent=q.cat||'';
+  const hb=$('hint-box');
+  if(q.hint && S.score>=20){hb.style.display='flex';$('hint-text').textContent=q.hint;}
+  else hb.style.display='none';
+  const gz=$('game-zone'); gz.innerHTML='';
+  if(q.mode==='mcq') renderMCQ(q,gz);
+  else if(q.mode==='word') renderWord(q,gz);
+  else if(q.mode==='seq') renderSeq(q,gz);
+  else if(q.mode==='mem') renderMem(q,gz);
+  startTimer(q.time);
+}
+
+// ─── MCQ ─────────────────────────────────────────────────────────────
+function renderMCQ(q,gz){
+  const og=document.createElement('div');
+  og.className='grid '+(q.opts.length<=2?'gc1':'gc2');
+  q.opts.forEach(opt=>{
+    const b=document.createElement('button'); b.className='opt'; b.textContent=opt;
+    b.onclick=()=>{
+      if(S.answered)return;
+      S.answered=true; clearInterval(timerID); S.total++;
+      document.querySelectorAll('.opt').forEach(x=>{x.disabled=true;if(x.textContent===q.ans)x.classList.add('cor');});
+      if(opt===q.ans){
+        S.correct++; b.classList.add('cor'); const pts=calcPts(); S.score+=pts;
+        $('score-num').textContent=S.score;
+        showFb('ok',`✅ बिल्कुल सही! +${pts} points`);
+        setTimeout(()=>nextLvl(),1500);
+      } else {
+        b.classList.add('wrg'); loseLife(`❌ गलत! सही था: ${q.ans}`);
+      }
+    };
+    og.appendChild(b);
+  });
+  gz.appendChild(og);
+}
+
+// ─── WORD HUNT ───────────────────────────────────────────────────────
+function renderWord(q,gz){
+  wordSt={word:q.word,found:q.word.split('').map(()=>false),wrong:0,max:6};
+  const wd=document.createElement('div'); wd.className='word-display';
+  q.word.split('').forEach((_,i)=>{
+    const lb=document.createElement('div'); lb.className='lbox'; lb.id='lb-'+i; lb.textContent=q.word[i];
+    wd.appendChild(lb);
+  });
+  gz.appendChild(wd);
+  const wi=document.createElement('div');
+  wi.className='wrong-info'; wi.id='wi'; wi.textContent='गलत: 0/6';
+  gz.appendChild(wi);
+  ['ABCDEFG','HIJKLMN','OPQRSTU','VWXYZ'].forEach(row=>{
+    const kr=document.createElement('div'); kr.className='kb-row';
+    row.split('').forEach(ch=>{
+      const kb=document.createElement('button'); kb.className='kbtn'; kb.textContent=ch; kb.id='kb-'+ch;
+      kb.onclick=()=>guessLetter(ch,q.word);
+      kr.appendChild(kb);
+    });
+    gz.appendChild(kr);
+  });
+}
+function guessLetter(ch,word){
+  if(S.answered)return;
+  const kb=$('kb-'+ch);
+  if(!kb||kb.classList.contains('ku'))return;
+  kb.classList.add('ku');
+  if(word.includes(ch)){
+    kb.classList.add('kc');
+    word.split('').forEach((l,i)=>{
+      if(l===ch){wordSt.found[i]=true; const lb=$('lb-'+i); lb.classList.remove('blank'); lb.classList.add('found');}
+    });
+    if(wordSt.found.every(Boolean)){
+      if(S.answered)return;
+      S.answered=true; clearInterval(timerID); S.total++; S.correct++;
+      const pts=calcPts()+20; S.score+=pts; $('score-num').textContent=S.score;
+      showFb('ok',`✅ शब्द मिला "${word}"! +${pts} points`);
+      setTimeout(()=>nextLvl(),1600);
+    }
+  } else {
+    kb.classList.add('kw'); wordSt.wrong++;
+    $('wi').textContent=`गलत: ${wordSt.wrong}/6`;
+    if(wordSt.wrong>=wordSt.max){
+      S.answered=true; clearInterval(timerID); S.total++;
+      word.split('').forEach((_,i)=>{const lb=$('lb-'+i);if(lb){lb.classList.remove('blank');lb.classList.add('reveal');}});
+      loseLife(`❌ Chances ख़त्म! शब्द था: "${word}"`);
+    }
+  }
+}
+
+// ─── SEQUENCE ────────────────────────────────────────────────────────
+function renderSeq(q,gz){
+  const sd=document.createElement('div'); sd.className='seq-disp';
+  q.seq.forEach(item=>{
+    const sb=document.createElement('div'); sb.className='sbox';
+    if(item==='?'){sb.classList.add('qmark'); sb.textContent='?'; sb.id='sq-ans';}
+    else sb.textContent=item;
+    sd.appendChild(sb);
+  });
+  gz.appendChild(sd);
+  const opts=genSeqOpts(q.ans,q.seqType);
+  const og=document.createElement('div'); og.className='grid gc2';
+  opts.forEach(opt=>{
+    const b=document.createElement('button'); b.className='opt'; b.textContent=opt;
+    b.onclick=()=>{
+      if(S.answered)return;
+      S.answered=true; clearInterval(timerID); S.total++;
+      document.querySelectorAll('.opt').forEach(x=>{x.disabled=true;if(x.textContent===String(q.ans))x.classList.add('cor');});
+      const ab=$('sq-ans');
+      if(opt===String(q.ans)){
+        S.correct++; b.classList.add('cor');
+        if(ab){ab.textContent=opt;ab.classList.remove('qmark');ab.classList.add('scor');}
+        const pts=calcPts(); S.score+=pts; $('score-num').textContent=S.score;
+        showFb('ok',`✅ Sequence पकड़ा! +${pts} points`);
+        setTimeout(()=>nextLvl(),1400);
+      } else {
+        b.classList.add('wrg');
+        if(ab){ab.textContent=q.ans;ab.classList.remove('qmark');ab.classList.add('swrg');}
+        loseLife(`❌ गलत! सही था: ${q.ans}`);
+      }
+    };
+    og.appendChild(b);
+  });
+  gz.appendChild(og);
+}
+function genSeqOpts(ans,type){
+  const opts=new Set([String(ans)]);
+  const extras={num:[...Array(12)].map((_,i)=>String(Number(ans)+(i+1)*(Math.random()>.5?1:-1))),
+    emo:['🌑','🌒','🌓','🌔','🌕','🔴','🔵','🟡','🟢','⭐','🍓','🌹','❄️','🔥'],
+    txt:['A','B','C','D','E','F','G','H','I','J','क','ख','ग','घ','ङ','च','छ','ज','झ','मई','जून','जुलाई','शुक्र','शनि','रवि']};
+  const pool=extras[type]||extras.num;
+  let attempts=0;
+  while(opts.size<4&&attempts<50){opts.add(pool[Math.floor(Math.random()*pool.length)]);attempts++;}
+  while(opts.size<4)opts.add(String(Number(ans)+opts.size*2));
+  return [...opts].sort(()=>Math.random()-.5);
+}
+
+// ─── MEMORY ──────────────────────────────────────────────────────────
+function renderMem(q,gz){
+  const cards=[...q.pairs,...q.pairs].sort(()=>Math.random()-.5);
+  memSt={cards,flipped:[],matched:new Set(),lock:false};
+  const mg=document.createElement('div'); mg.className='mem-grid';
+  cards.forEach((emoji,i)=>{
+    const mc=document.createElement('div'); mc.className='mcard flip'; mc.id='mc-'+i;
+    mc.textContent=emoji; mc.onclick=()=>flipCard(i,cards.length);
+    mg.appendChild(mc);
+  });
+  gz.appendChild(mg);
+  const info=document.createElement('div'); info.id='meminfo';
+  info.style.cssText='text-align:center;font-size:.8rem;color:var(--muted);margin-top:6px';
+  info.textContent=`याद करो! ${Math.ceil(q.showTime/1000)} seconds में छुपेगा...`;
+  gz.appendChild(info);
+  setTimeout(()=>{
+    if(S.answered)return;
+    document.querySelectorAll('.mcard').forEach(mc=>{mc.classList.remove('flip');mc.textContent='❓';});
+    $('meminfo').textContent='Pairs ढूँढो! Click करो।';
+  },q.showTime);
+}
+function flipCard(idx,total){
+  if(memSt.lock||memSt.matched.has(idx)||memSt.flipped.includes(idx))return;
+  const mc=$('mc-'+idx);
+  if(!mc||mc.classList.contains('matched'))return;
+  mc.classList.add('flip'); mc.textContent=memSt.cards[idx];
+  memSt.flipped.push(idx);
+  if(memSt.flipped.length===2){
+    memSt.lock=true;
+    const [a,b]=memSt.flipped;
+    if(memSt.cards[a]===memSt.cards[b]){
+      [$('mc-'+a),$('mc-'+b)].forEach(el=>{if(el){el.classList.remove('flip');el.classList.add('matched');}});
+      memSt.matched.add(a); memSt.matched.add(b);
+      memSt.flipped=[]; memSt.lock=false;
+      if(memSt.matched.size===total&&!S.answered){
+        S.answered=true; clearInterval(timerID); S.total++; S.correct++;
+        const pts=calcPts()+30; S.score+=pts; $('score-num').textContent=S.score;
+        showFb('ok',`✅ सभी pairs मिलीं! +${pts} points`);
+        setTimeout(()=>nextLvl(),1500);
+      }
+    } else {
+      setTimeout(()=>{
+        [$('mc-'+a),$('mc-'+b)].forEach(el=>{if(el){el.classList.remove('flip');el.textContent='❓';}});
+        memSt.flipped=[]; memSt.lock=false;
+      },900);
+    }
+  }
+}
+
+// ─── RESULT ──────────────────────────────────────────────────────────
+function showResult(type){
+  clearInterval(timerID);
+  $('game').style.display='none';
+  $('result').style.display='flex';
+  const acc=S.total>0?Math.round(S.correct/S.total*100):0;
+  $('r-score').textContent=S.score;
+  $('r-acc').textContent=acc+'%';
+  $('r-lvl').textContent=S.lvl-1;
+  if(type==='win'){
+    $('r-icon').textContent='🏆';
+    $('r-title').textContent='BRAIN MASTER!';
+    $('r-sub').textContent='वाह! आपने सभी 200 levels पूरे किए! आप सच में Genius हैं! 🧠';
+  } else {
+    const icons=['😤','💀','🫠','😵'];
+    $('r-icon').textContent=icons[Math.floor(Math.random()*4)];
+    $('r-title').textContent='GAME OVER!';
+    $('r-sub').textContent=`Level ${S.lvl-1} पर रुक गए। हिम्मत रखो — फिर से try करो! 💪`;
+  }
+}
+
+// ─── PUBLIC FUNCTIONS ────────────────────────────────────────────────
+window.startGame=function(){
+  initS(1);
+  $('cover').style.display='none';
+  $('game').style.display='block';
+  $('result').style.display='none';
+  loadQ();
+};
+window.restartLevel=function(){
+  const l=Math.max(1,S.lvl-1);
+  initS(l);
+  $('result').style.display='none';
+  $('game').style.display='block';
+  loadQ();
+};
+window.goHome=function(){
+  clearInterval(timerID);
+  $('result').style.display='none';
+  $('game').style.display='none';
+  $('cover').style.display='flex';
+};
+
+})();
+</script>
+</body>
+</html>
